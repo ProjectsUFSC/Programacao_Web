@@ -1,7 +1,7 @@
 <template>
     <div id="footer">
 
-        <p>&copy;    2024 - Desenvolvido por <a href="https://github.com/Dleffe" target="_black">Augusto Daleffe</a></p>
+        <p>&copy;    2024 - Desenvolvido por <a href="https://github.com/Dleffe" target="_blank">Augusto Daleffe</a></p>
 
     </div>
 </template>
