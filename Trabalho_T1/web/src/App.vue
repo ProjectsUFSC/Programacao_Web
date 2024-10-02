@@ -1,20 +1,13 @@
+<!-- src/App.vue -->
 <template>
-  <div>
-    <Header/>
-    <Footer/>
+  <div id="app">
+    <router-view />
   </div>
 </template>
 
-
 <script>
-  import Header from './components/Header.vue'
-  import Footer from './components/Footer.vue'
   export default {
     name: 'App',
-    components: {
-      Header,
-      Footer
-    }
   }
 </script>
 
@@ -22,5 +15,6 @@
   body {
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
   }
 </style>

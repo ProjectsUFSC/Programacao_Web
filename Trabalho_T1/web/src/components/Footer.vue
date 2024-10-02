@@ -17,11 +17,11 @@ export default {
     #footer {
         display: flex;
         justify-content: start;
-        align-items: end;
+        align-items: center;
         background-color: #002b76;
         color: white;
         padding: 10px;
-        height: 80px;
+        height: 40px;
         width: 100%;
         position: absolute;
         bottom: 0px;
