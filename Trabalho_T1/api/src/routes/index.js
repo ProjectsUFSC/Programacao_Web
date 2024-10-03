@@ -4,7 +4,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
     res.send('Servidor online');
-});
+});npm 
 
 router.get('/lista', (req, res) => {
     res.send('Lista');
