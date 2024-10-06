@@ -6,12 +6,12 @@
         <form @submit.prevent="handleLogin">
             <div class="input-group">
                 <label for="idUFSC">ID UFSC</label>
-                <input type="text" id="idUFSC" v-model="idUFSC" placeholder="Digite seu ID UFSC" required/>
+                <input type="text" id="idUFSC" v-model="idufsc" placeholder="Digite seu ID UFSC" required/>
             </div>
 
             <div class="input-group">
                 <label for="password">Senha</label>
-                <input type="password" id="password" v-model="password" placeholder="Digite sua senha" required/>
+                <input type="password" id="password" v-model="senha" placeholder="Digite sua senha" required/>
             </div>
 
             <div class="button-group">
@@ -27,6 +27,7 @@
 <script>
 import Header from "../components/Header.vue";
 import Footer from "../components/Footer.vue";
+import axios from "axios";
 
 export default {
     components: {
@@ -35,14 +36,36 @@ export default {
         },
     data() {
         return {
-            idUFSC: "",
-            password: "",
+            idufsc: "",
+            senha: "",
         };
     },
     methods: {
         handleLogin() {
-            // Aqui você pode adicionar a lógica de autenticação, como chamar uma API
-            console.log("Entrando com: {{this.idUFSC}} e a senha {{this.password}}", this.idUFSC, this.password);
+            axios.post("api/login", {
+                idufsc: this.idufsc,
+                senha: this.senha,
+            })
+
+            .then((response) => {
+                localStorage.setItem("token", response.data.token);
+                this.$router.push("/home");
+                
+            })
+            .catch((error) => {
+                if (error.response.status === 404) {
+                    alert("Usuário inválido, tente novamente");
+                } else if (error.response.status === 401) {
+                    alert("Senha inválida, tente novamente");
+                }
+                else {
+                    alert("Erro ao tentar fazer login");
+                }
+
+            });
+
+
+                
         },
         goToRegister() {
             this.$router.push("/cadastro");

@@ -6,12 +6,12 @@
                 <form @submit.prevent="handleRegister">
                     <div class="input-group">
                         <label for="name">Nome</label>
-                        <input type="text" id="name" v-model="name" placeholder="Digite seu nome completo" required/>
+                        <input type="text" id="name" v-model="nome" placeholder="Digite seu nome completo" required/>
                     </div>
             
                     <div class="input-group">
                         <label for="idUFSC">ID UFSC</label>
-                        <input type="text" id="idUFSC" v-model="idUFSC" placeholder="Digite seu ID UFSC" required/>
+                        <input type="text" id="idUFSC" v-model="idufsc" placeholder="Digite seu ID UFSC" required/>
                     </div>
             
                     <div class="input-group">
@@ -21,7 +21,7 @@
             
                     <div class="input-group">
                         <label for="password">Senha</label>
-                        <input type="password" id="password" v-model="password" placeholder="Digite sua senha" required/>
+                        <input type="password" id="password" v-model="senha" placeholder="Digite sua senha" required/>
                     </div>
             
                     <div class="button-group">
@@ -37,6 +37,7 @@
 <script>
     import Header from "../components/Header.vue";
     import Footer from "@/components/Footer.vue";
+    import axios from 'axios';
     export default {
         components: {
             Header,
@@ -44,19 +45,29 @@
         },
         data() {
         return {
-            name: '',
-            idUFSC: '',
+            nome: '',
+            idufsc: '',
             email: '',
-            password: ''
+            senha: ''
         };
         },
         methods: {
         handleRegister() {
-            console.log('Cadastro enviado:', {
-            name: this.name,
-            idUFSC: this.idUFSC,
+            axios.post('api/cadastro', {
+            nome: this.nome,
+            idufsc: this.idufsc,
             email: this.email,
-            password: this.password
+            senha: this.senha
+            })
+            .then((response) => {
+            this.$router.push('/');
+            })
+            .catch((error) => {
+            if (error.response.status === 409) {
+                alert('Usuário já cadastrado');
+            } else {
+                alert('Erro ao tentar cadastrar');
+            }
             });
         },
 

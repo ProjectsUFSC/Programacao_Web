@@ -8,7 +8,7 @@
                 <ul>
                     <li v-for="(sala, index) in salas" :key="index" class="sala-item">
                     <div class="sala-info">
-                        <h3>{{ sala.nome }}</h3>
+                        <h3>{{ sala }}</h3>
                         <button @click="abrirSala(sala)">Abrir</button>
                     </div>
                     </li>
@@ -26,6 +26,7 @@
 <script>
     import Header from "../components/Header.vue";
     import Footer from "../components/Footer.vue";
+import axios from "axios";
 
     export default {
         name : "Home",
@@ -35,9 +36,22 @@
         },
         data(){
             return {
-                salas: [
-                ],
+                salas: [],
             };
+        },
+        created() {
+            const token = localStorage.getItem("token");
+            axios.get("api/lista", {
+                headers: {
+                    authorization: token 
+                },
+            })
+            .then((response) => {
+                this.salas = response.data.salas;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
         },
         methods: {
             abrirSala(sala) {
