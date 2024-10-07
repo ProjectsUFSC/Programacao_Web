@@ -1,5 +1,8 @@
 import Usuario from "../models/usuario.js"
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import { fechaduras } from "../../server.js"
+
 
 export const getUsers = async (req, res) => {
     try{
@@ -17,7 +20,7 @@ export const login = async (req, res) => {
         const usuario = await Usuario.findOne({idufsc: req.body.idufsc})
         if(!usuario){
             return res.status(404).json({ message: 'Usuário não encontrado' })}
-        if(usuario.senha !== req.body.senha){
+        if(bcrypt.compare(req.body.senha, usuario.senha) == false){
             return res.status(401).json({ message: 'Senha incorreta' })}
         
         const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET)
@@ -32,7 +35,7 @@ export const cadastro = async (req, res) => {
         nome: req.body.nome,
         idufsc: req.body.idufsc,
         email: req.body.email,
-        senha: req.body.senha
+        senha: await bcrypt.hash(req.body.senha, 10),
     })
     try{
         if(await Usuario.findOne({idufsc: req.body.idufsc})){
@@ -55,8 +58,16 @@ export const listaPortas = async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar salas', error: error.message });
     }}
 
+export const abrePorta = (req, res) => {
+    const porta = fechaduras[req.body.id];
 
-    
+    if (!porta) {
+        return res.status(404).json({ message: 'Porta não encontrada' });
+    }
+    else {
+        porta.send(JSON.stringify({ tipo: 'abre' }));
+        res.status(200).json({ message: 'Porta aberta' });
+    }
+};
 
-
-export default {getUsers, login, cadastro, listaPortas } 
+export default {getUsers, login, cadastro, listaPortas, abrePorta}
