@@ -20,10 +20,10 @@ export const login = async (req, res) => {
         const usuario = await Usuario.findOne({idufsc: req.body.idufsc})
         if(!usuario){
             return res.status(404).json({ message: 'Usuário não encontrado' })}
-        if(bcrypt.compare(req.body.senha, usuario.senha) == false){
+        if(await bcrypt.compare(req.body.senha, usuario.senha) == false){
             return res.status(401).json({ message: 'Senha incorreta' })}
         
-        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET)
+        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '30s' })
         res.status(200).json({ message: 'Login efetuado com sucesso', token: token, id: usuario._id })
 
     } catch (error) {
