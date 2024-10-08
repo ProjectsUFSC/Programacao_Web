@@ -40,13 +40,15 @@ export default {
             senha: "",
         };
     },
+    created(){
+        localStorage.clear();
+    },
     methods: {
         handleLogin() {
             axios.post("api/login", {
                 idufsc: this.idufsc,
                 senha: this.senha,
             })
-
             .then((response) => {
                 localStorage.setItem("token", response.data.token);
                 this.$router.push("/home");

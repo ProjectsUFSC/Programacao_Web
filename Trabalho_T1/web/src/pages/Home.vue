@@ -9,7 +9,8 @@
                     <li v-for="(sala, index) in salas" :key="index" class="sala-item">
                     <div class="sala-info">
                         <h3>{{ sala }}</h3>
-                        <button @click="abrirSala(sala)">Abrir</button>
+                        <button v-if="!salasAbertas.includes(sala)"  @click="abrirSala(sala)">Abrir</button>
+                        <button id="abrindo"  v-else >Abrindo...</button>
                     </div>
                     </li>
                 </ul>
@@ -26,7 +27,7 @@
 <script>
     import Header from "../components/Header.vue";
     import Footer from "../components/Footer.vue";
-import axios from "axios";
+    import axios from "axios";
 
     export default {
         name : "Home",
@@ -37,6 +38,8 @@ import axios from "axios";
         data(){
             return {
                 salas: [],
+                salasAbertas: []
+                
             };
         },
         created() {
@@ -50,14 +53,28 @@ import axios from "axios";
                 this.salas = response.data.salas;
             })
             .catch((error) => {
-                console.log(error);
+                    alert("Sessão expirada, faça login novamente.");
+                    this.$router.push('/');
+                    
             });
         },
         methods: {
             abrirSala(sala) {
-                this.$router.push({ name: "Sala", params: { sala } });
+                this.salasAbertas.push(sala);
+                axios.post("api/abre", {
+                    id: sala
+                })
+                .then((response) => {
+                    setTimeout(() => {
+                        const index = this.salasAbertas.indexOf(sala);
+                        if (index !== -1) {
+                            this.salasAbertas.splice(index, 1);
+                        }
+                    }, 2000);
+                })  
             },
             goToLogin(){
+                localStorage.removeItem("token");
                 this.$router.push('/');
             }
 
@@ -137,5 +154,10 @@ button {
 
 button:hover {
     background-color: #00b32a;
+}
+
+#abrindo {
+    background-color: #44576b;
+    cursor: not-allowed;
 }
 </style>
