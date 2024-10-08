@@ -1,7 +1,8 @@
 <template>
     <div>
         <Header/>
-        <button id="sair" @click="goToLogin"><img src="/imgs/sair-icon.png" alt="">Sair</button>
+        <button class="top-button sair" @click="goToLogin"><img src="/imgs/sair-icon.png" alt="">Sair</button>
+        <button class="top-button cadastro" v-if="this.isAdmin" @click="gerenciador">Gerenciar Acessos</button>
         <div class="home-container">
             <h1>Salas Disponíveis</h1>
             <div class="sala-container" v-if="salas.length > 0">
@@ -9,7 +10,7 @@
                     <li v-for="(sala, index) in salas" :key="index" class="sala-item">
                     <div class="sala-info">
                         <h3>{{ sala }}</h3>
-                        <button v-if="!salasAbertas.includes(sala)"  @click="abrirSala(sala)">Abrir</button>
+                        <button id="abrir" v-if="!salasAbertas.includes(sala)"  @click="abrirSala(sala)">Abrir</button>
                         <button id="abrindo"  v-else >Abrindo...</button>
                     </div>
                     </li>
@@ -38,8 +39,8 @@
         data(){
             return {
                 salas: [],
-                salasAbertas: []
-                
+                salasAbertas: [],
+                isAdmin: false
             };
         },
         created() {
@@ -51,6 +52,9 @@
             })
             .then((response) => {
                 this.salas = response.data.salas;
+                if(response.data.isAdmin){
+                    this.isAdmin = true;
+                }
             })
             .catch((error) => {
                     alert("Sessão expirada, faça login novamente.");
@@ -84,10 +88,9 @@
 
 <style scoped>
 
-#sair {
+.top-button {
+    height: 50px;
     position: absolute;
-    top: 120px;
-    right: 20px;
     background-color: #002b76;
     color: white;
     border: none;
@@ -97,13 +100,25 @@
     align-items: center;
 }
 
-#sair:hover {
+.top-button:hover {
     background-color: #1a5fd6;
 }
 
-#sair img {
+.top-button img {
     width: 20px;
     margin-right: 5px;
+}
+
+.sair {
+    top: 120px;
+    right: 20px;
+    padding: 10px 20px;
+}
+
+.cadastro {
+    top: 120px;
+    right: 150px;
+    padding: 10px 20px;
 }
 
 .home-container {
@@ -143,7 +158,7 @@ ul{
     align-items: center;
 }
 
-button {
+#abrir {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -152,12 +167,29 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+#abrir:hover {
     background-color: #00b32a;
 }
 
 #abrindo {
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
     background-color: #44576b;
     cursor: not-allowed;
+}
+
+#cadastro {
+    font-size: 15px;
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #002b76;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 </style>
