@@ -22,8 +22,8 @@ export const login = async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado' })}
         if(await bcrypt.compare(req.body.senha, usuario.senha) == false){
             return res.status(401).json({ message: 'Senha incorreta' })}
-        
-        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '30s' })
+
+        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
         res.status(200).json({ message: 'Login efetuado com sucesso', token: token, id: usuario._id })
 
     } catch (error) {
@@ -52,8 +52,11 @@ export const listaPortas = async (req, res) => {
         if (!usuario) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
-
-        res.status(200).json({ salas: usuario.salas });
+        const master = await Usuario.findOne({idufsc: "masterUser"});
+        if (usuario.id == master.id) {
+            return res.status(200).json({salas: usuario.salas , isAdmin: true });
+        }
+        res.status(200).json({ salas: usuario.salas , isAdmin: false });
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar salas', error: error.message });
     }}
