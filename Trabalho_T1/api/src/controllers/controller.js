@@ -6,7 +6,7 @@ import { fechaduras } from "../../server.js"
 
 export const getUsers = async (req, res) => {
     try{
-        const usuarios = await Usuario.find()
+        const usuarios = await Usuario.find().select('nome idufsc')
         if(usuarios == null){
             return res.status(404).json({ message: 'Nenhum usuário encontrado' })}
         res.status(200).json(usuarios)
@@ -73,4 +73,22 @@ export const abrePorta = (req, res) => {
     }
 };
 
-export default {getUsers, login, cadastro, listaPortas, abrePorta}
+export const cadastraPorta = async (req, res) => {
+    try{
+        const usuario = await Usuario.findById(req.body.id)
+        if(!usuario){
+            return res.status(404).json({ message: 'Usuário não encontrado' })}
+        if(usuario.salas.includes(req.body.sala)){
+            return res.status(409).json({ message: 'Porta já cadastrada' })}
+            
+        usuario.salas.push(req.body.sala)
+        await usuario.save()
+
+        res.status(201).json({ message: 'Porta cadastrada com sucesso' })
+    } catch (error) {
+        res.status(400).json({message: 'Erro ao cadastrar porta', error: error.message})}
+
+
+}
+
+export default {getUsers, login, cadastro, listaPortas, abrePorta, cadastraPorta}

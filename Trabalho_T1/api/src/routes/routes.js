@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import Usuario from '../models/usuario.js'
-import { getUsers, login, cadastro, listaPortas, abrePorta } from '../controllers/controller.js'
-import { authenticaToken } from '../middlewares/middlewares.js'
+import { getUsers, login, cadastro, listaPortas, abrePorta, cadastraPorta } from '../controllers/controller.js'
+import { authenticaToken, masterAuthentication } from '../middlewares/middlewares.js'
 
 const router = Router()
 
@@ -19,5 +19,6 @@ router.get('/lista',authenticaToken, listaPortas)
 
 router.post('/abre', abrePorta)
 
+router.post('/adiciona', masterAuthentication ,cadastraPorta)
 
 export default router;

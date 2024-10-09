@@ -44,7 +44,6 @@ wsServer.on('connect', function(connection) {
             let dados = JSON.parse(message.utf8Data);
             console.log(`\nFechadura ${dados.id} com senha ${dados.passwd} foi cadastrada`);
             fechaduras[dados.id] = connection;
-            console.log(fechaduras);
         }
 
 
