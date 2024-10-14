@@ -17,7 +17,7 @@ router.post('/cadastro', cadastro)
 
 router.get('/lista',authenticaToken, listaPortas)
 
-router.post('/abre', abrePorta)
+router.post('/abre',authenticaToken, abrePorta)
 
 router.post('/adiciona', masterAuthentication ,cadastraPorta)
 

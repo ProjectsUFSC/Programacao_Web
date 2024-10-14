@@ -61,8 +61,14 @@ export const listaPortas = async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar salas', error: error.message });
     }}
 
-export const abrePorta = (req, res) => {
-    const porta = fechaduras[req.body.id];
+export const abrePorta = async (req, res) => {
+    const porta = req.body.sala
+    const usuario = await Usuario.findById(req.user.id)
+
+    if(!usuario){
+        return res.status(404).json({ message: 'Usuário não encontrado' })}
+    if(!usuario.salas.includes(req.body.sala)){
+        return res.status(403).json({ message: 'Usuário não tem acesso a essa sala' })}
 
     if (!porta) {
         return res.status(404).json({ message: 'Porta não encontrada' });

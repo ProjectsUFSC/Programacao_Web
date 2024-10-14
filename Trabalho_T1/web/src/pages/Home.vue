@@ -98,7 +98,12 @@
         methods: {
             abrirSala(sala) {
                 axios.post("api/abre", {
-                    id: sala
+                    sala: sala
+                },
+                {
+                    headers: {
+                        authorization: localStorage.getItem("token")
+                    }
                 })
                 .then((response) => {
                     this.salasAbertas.push(sala);
@@ -113,7 +118,11 @@
                     if(error.response.status === 404){
                         alert("Sala não conectada.");
                     } else if(error.response.status === 401){
-                        alert("Acesso não autorizado.")};
+                        alert("Acesso não autorizado.")
+                    } else if(error.response.status === 403){
+                        alert("Você não tem permissão para acessar esta sala.");
+                    }
+
                 });  
             },
             goToLogin(){
