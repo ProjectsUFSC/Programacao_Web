@@ -119,8 +119,11 @@
                         alert("Sala não conectada.");
                     } else if(error.response.status === 401){
                         alert("Acesso não autorizado.")
-                    } else if(error.response.status === 403){
+                    } else if(error.response.status === 402){
                         alert("Você não tem permissão para acessar esta sala.");
+                    } else if(error.response.status === 403){
+                        alert("Sessão expirada, faça login novamente.");
+                        this.$router.push('/');
                     }
 
                 });  

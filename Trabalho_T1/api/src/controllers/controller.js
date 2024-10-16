@@ -23,7 +23,7 @@ export const login = async (req, res) => {
         if(await bcrypt.compare(req.body.senha, usuario.senha) == false){
             return res.status(401).json({ message: 'Senha incorreta' })}
 
-        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '30m' })
         res.status(200).json({ message: 'Login efetuado com sucesso', token: token, id: usuario._id })
 
     } catch (error) {
@@ -62,13 +62,13 @@ export const listaPortas = async (req, res) => {
     }}
 
 export const abrePorta = async (req, res) => {
-    const porta = req.body.sala
+    const porta = fechaduras[req.body.sala]
     const usuario = await Usuario.findById(req.user.id)
 
     if(!usuario){
         return res.status(404).json({ message: 'Usuário não encontrado' })}
     if(!usuario.salas.includes(req.body.sala)){
-        return res.status(403).json({ message: 'Usuário não tem acesso a essa sala' })}
+        return res.status(402).json({ message: 'Usuário não tem acesso a essa sala' })}
 
     if (!porta) {
         return res.status(404).json({ message: 'Porta não encontrada' });
