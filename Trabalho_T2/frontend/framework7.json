@@ -1,0 +1,18 @@
+{
+  "cwd": "/home/frr/Downloads/aula",
+  "type": [
+    "web"
+  ],
+  "name": "exercicio_aula",
+  "framework": "vue",
+  "template": "tabs",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": true,
+    "color": "#007aff",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}
