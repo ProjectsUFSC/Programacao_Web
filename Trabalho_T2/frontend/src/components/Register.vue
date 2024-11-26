@@ -46,20 +46,46 @@
       };
     },
     methods: {
-        async handleRegister() {
-            try {
-                await axios.post('http://localhost:3000/api/register', {
-                user: this.username,
-                password: this.password,
-                });
-                this.successMessage = 'Usuário registrado com sucesso!';
-                this.errorMessage = '';
-            } catch (error) {
-                console.error('Erro ao registrar usuário:', error.response?.data || error.message);
-                this.successMessage = '';
-                this.errorMessage = 'Erro ao registrar usuário.';
-            }
+      async handleRegister() {
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          let subscription = await registration.pushManager.getSubscription();
+
+          if (!subscription) {
+            const applicationServerKey = this.urlBase64ToUint8Array(
+              'BIbZtGu3zn4dudFdSoZbX1Rrz8rAnkD1eRz3OPrrdP3VoqS3emh2q_1pnp6sVZbxUrXdurPVTeH8_iIXGzYg8jE'
+            );
+            subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey,
+            });
+          }
+
+          await axios.post('http://localhost:3000/api/register', {
+            user: this.username,
+            password: this.password,
+            pushSubscription: subscription,
+          });
+
+          this.successMessage = 'Usuário registrado com sucesso!';
+          this.errorMessage = '';
+        } catch (error) {
+          console.error('Erro ao registrar usuário:', error.response?.data || error.message);
+          this.successMessage = '';
+          this.errorMessage = 'Erro ao registrar usuário.';
         }
+      },
+      // Helper function to convert VAPID key
+      urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+      },
     },
   };
   </script>

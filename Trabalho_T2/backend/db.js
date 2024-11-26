@@ -19,10 +19,10 @@ async function conectaDB() {
   }
 }
 
-async function registraUsuario(user, password) {
+async function registraUsuario(user, password, pushsubscription) {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const result = await clientes.insertOne({ user, password: hashedPassword });
+      const result = await clientes.insertOne({ user, password: hashedPassword, pushsubscription: pushsubscription});
       return result.insertedId;
     } catch (error) {
       console.error('Erro ao registrar usuário:', error.message);
@@ -51,6 +51,20 @@ const autenticaUsuario = async (user, password) => {
     throw error;
   }
 };
+
+function autenticaToken(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Token não fornecido' });
+  }
+  try {
+    const decoded = jwt.verify(token, ChaveSecreta);
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    res.status(403).json({ message: 'Token inválido' });
+  }
+}
 
 async function AdicionaCodigo(username, code) {
     try {
@@ -84,25 +98,40 @@ async function buscarCodigos(userId) {
 
 async function AchaCodigo(code) {
   try {
-    const usuario = await clientes.findOne({ codes: code });
+    const usuario = await clientes.findOne({ codes: code }, { projection: { pushSubscription: 1 } });
     if (!usuario) {
       console.error('Código não encontrado');
       return null;
     }
-    return usuario;
+    return usuario.pushSubscription || null;
   } catch (error) {
-    console.error('Erro ao buscar usuário pelo código:', error.message);
+    console.error('Erro ao buscar pushSubscription pelo código:', error.message);
     throw error;
   }
 }
 
+
 async function CodigoAleatorio() {
   try {
-    const users = await clientes.aggregate([
+    const result = await clientes.aggregate([
       { $unwind: '$codes' },
-      { $sample: { size: 1 } }
+      { $sample: { size: 1 } }, 
+      {
+        $project: {
+          code: '$codes',
+          pushSubscription: 1
+        }
+      }
     ]).toArray();
-    return users.length > 0 ? users[0].codes : null;
+
+    if (result.length > 0) {
+      return {
+        code: result[0].code,
+        pushSubscription: result[0].pushSubscription || null
+      };
+    } else {
+      return null;
+    }
   } catch (error) {
     console.error('Erro ao buscar código aleatório:', error.message);
     throw error;
@@ -116,6 +145,7 @@ module.exports = {
   conectaDB,
   registraUsuario,
   autenticaUsuario,
+  autenticaToken,
   AdicionaCodigo,
   buscarCodigos,
   AchaCodigo,

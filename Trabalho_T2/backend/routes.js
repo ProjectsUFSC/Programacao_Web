@@ -1,84 +1,110 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const webpush = require ('web-push');
 
-// Example routes
+const chaves = require('./webpush-keys.json');
+const SUBJECT = 'mailto:seu-email@dominio.com';
+
 router.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
 router.post('/register', async (req, res) => {
-    const { user, password } = req.body;
+  const { user, password, pushSubscription } = req.body;
 
-    try {
-      const userId = await db.registraUsuario(user, password);
-      res.status(201).json({ success: true, message: 'Usuário registrado com sucesso!', userId });
-    } catch (error) {
-      res.status(500).json({ success: false, message: 'Erro ao registrar usuário', error: error.message });
-    }
-  });
+  try {
+    const userId = await db.registraUsuario(user, password, pushSubscription);
+    res.status(201).json({ success: true, message: 'Usuário registrado com sucesso!', userId });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao registrar usuário', error: error.message });
+  }
+});
 
 router.post('/login', async (req, res) => {
-    const { user, password } = req.body;
+  const { user, password } = req.body;
+
+  try {
+    const authData = await db.autenticaUsuario(user, password);
+    if (authData) {
+      res.status(200).json({ success: true, token: authData.token, userId: authData.userId });
+    } else {
+      res.status(401).json({ success: false, message: 'Credenciais inválidas' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao fazer login', error: error.message });
+  }
+});
+
+router.post('/qr-codes', db.autenticaToken, async (req, res) => {
+  const { code, username } = req.body;
+
+  if (!code || !username) {
+      return res.status(400).json({ success: false, message: 'Código e username são obrigatórios' });
+  }
+
+  try {
+      const updatedUser = await AdicionaCodigo(username, code);
+      res.status(200).json({ success: true, message: 'QR-Code salvo com sucesso!', user: updatedUser });
+  } catch (error) {
+      console.error('Erro ao salvar QR-Code:', error.message);
+      res.status(500).json({ success: false, message: 'Erro ao salvar QR-Code' });
+  }
+});
+
+router.get('/user-qr-codes', db.autenticaToken, async (req, res) => {
+  const userId = req.userId;
+  try {
+    const codes = await db.buscarCodigos(userId);
+    console.log(codes)
+    res.status(200).json({ success: true, codes });
+  } catch (error) {
+    console.error('Erro ao buscar QR-Codes do usuário:', error.message);
+    res.status(500).json({ success: false, message: 'Erro ao buscar QR-Codes' });
+  }
+});
+
+async function envia(destinatario, assunto) {
+
+  webpush.setVapidDetails(SUBJECT, chaves.publicKey, chaves.privateKey);
   
-    try {
-      const authData = await db.autenticaUsuario(user, password);
-      if (authData) {
-        res.status(200).json({ success: true, token: authData.token, userId: authData.userId });
-      } else {
-        res.status(401).json({ success: false, message: 'Credenciais inválidas' });
-      }
-    } catch (error) {
-      res.status(500).json({ success: false, message: 'Erro ao fazer login', error: error.message });
+  webpush.sendNotification(
+      destinatario,
+      JSON.stringify({
+          title: 'Sorteio',
+          message: assunto
+      })
+  );
+}
+
+router.post('/sorteio', async function (req, resp) {
+  console.log('Realizando sorteio e enviando mensagem para um cliente aleatório');
+
+  try {
+    const resultado = await CodigoAleatorio();
+    if (!resultado) {
+      return resp.status(404).json({ success: false, message: 'Nenhum código disponível para sorteio' });
     }
-  });
 
+    const { code, pushSubscription } = resultado;
 
-function autenticarToken(req, res, next) {
-const token = req.headers.authorization?.split(' ')[1];
-if (!token) {
-    return res.status(401).json({ message: 'Token não fornecido' });
-}
-try {
-    const decoded = jwt.verify(token, ChaveSecreta);
-    req.userId = decoded.userId;
-    next();
-} catch (error) {
-    res.status(403).json({ message: 'Token inválido' });
-}
-}
-
-router.post('/qr-codes', autenticarToken, async (req, res) => {
-const { code, username } = req.body;
-
-if (!code || !username) {
-    return res.status(400).json({ success: false, message: 'Código e username são obrigatórios' });
-}
-
-try {
-    const updatedUser = await AdicionaCodigo(username, code); // Atualiza o banco com o QR-Code
-    res.status(200).json({ success: true, message: 'QR-Code salvo com sucesso!', user: updatedUser });
-} catch (error) {
-    console.error('Erro ao salvar QR-Code:', error.message);
-    res.status(500).json({ success: false, message: 'Erro ao salvar QR-Code' });
-}
-});
-
-router.get('/user-qr-codes', autenticarToken, async (req, res) => {
-    const userId = req.userId;
-    try {
-      const codes = await db.buscarCodigos(userId);
-      console.log(codes)
-      res.status(200).json({ success: true, codes });
-    } catch (error) {
-      console.error('Erro ao buscar QR-Codes do usuário:', error.message);
-      res.status(500).json({ success: false, message: 'Erro ao buscar QR-Codes' });
+    if (!pushSubscription) {
+      return resp.status(404).json({ success: false, message: 'PushSubscription não encontrada para o código selecionado' });
     }
+
+    const mensagem = `Codigo: ${code}. Parabéns, você foi sorteado na promoção dos produtos X, entre em contato para receber seu prêmio.`;
+
+    await envia(pushSubscription, mensagem);
+
+    resp.status(200).json({
+      success: true,
+      message: 'Mensagem enviada com sucesso',
+      sorteado: { code, pushSubscription }
+    });
+  } catch (error) {
+    console.error('Erro ao realizar o sorteio:', error.message);
+    resp.status(500).json({ success: false, message: 'Erro ao realizar o sorteio', error: error.message });
+  }
 });
 
-router.get('/notificação', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date() });
-});
-
-// Add more routes as needed
 module.exports = router;

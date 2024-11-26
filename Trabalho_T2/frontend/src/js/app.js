@@ -32,5 +32,17 @@ registerComponents(app);
 // Use the router
 app.use(router);
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./service-worker.js')
+      .then(registration => {
+        console.log('Service Worker registrado com sucesso:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Falha ao registrar o Service Worker:', error);
+      });
+  }
+  
+
 // Mount the app
 app.mount('#app');
