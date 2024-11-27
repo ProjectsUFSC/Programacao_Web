@@ -12,18 +12,18 @@ router.get('/', (req, res) => {
 
 router.post('/register', async (req, res) => {
   const { user, password, pushSubscription } = req.body;
-
+  console.log('Received PushSubscription:', pushSubscription);
+  debugger
   try {
     const userId = await db.registraUsuario(user, password, pushSubscription);
     res.status(201).json({ success: true, message: 'Usuário registrado com sucesso!', userId });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Erro ao registrar usuário', error: error.message });
+    res.status(500).json({ success: false, message: req.body, error: error.message });
   }
 });
 
 router.post('/login', async (req, res) => {
   const { user, password } = req.body;
-
   try {
     const authData = await db.autenticaUsuario(user, password);
     if (authData) {

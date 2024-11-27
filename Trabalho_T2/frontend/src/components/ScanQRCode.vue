@@ -38,7 +38,7 @@ export default {
       const token = localStorage.getItem("token");
       const username = localStorage.getItem("username");
       try {
-        const response = await axios.get("http://localhost:3000/api/user-qr-codes",
+        const response = await axios.get("https://localhost:3000/api/user-qr-codes",
         { username: username }, 
         { headers: { Authorization: `Bearer ${token}` },});
         this.userQrCodes = response.data.codes;

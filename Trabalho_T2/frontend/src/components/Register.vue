@@ -50,7 +50,7 @@
         try {
           const registration = await navigator.serviceWorker.ready;
           let subscription = await registration.pushManager.getSubscription();
-
+          
           if (!subscription) {
             const applicationServerKey = this.urlBase64ToUint8Array(
               'BIbZtGu3zn4dudFdSoZbX1Rrz8rAnkD1eRz3OPrrdP3VoqS3emh2q_1pnp6sVZbxUrXdurPVTeH8_iIXGzYg8jE'
@@ -60,7 +60,7 @@
               applicationServerKey,
             });
           }
-
+          console.log(subscription)
           await axios.post('http://localhost:3000/api/register', {
             user: this.username,
             password: this.password,

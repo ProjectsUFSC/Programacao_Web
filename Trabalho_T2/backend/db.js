@@ -21,6 +21,7 @@ async function conectaDB() {
 
 async function registraUsuario(user, password, pushsubscription) {
     try {
+      
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await clientes.insertOne({ user, password: hashedPassword, pushsubscription: pushsubscription});
       return result.insertedId;
@@ -54,6 +55,9 @@ const autenticaUsuario = async (user, password) => {
 
 function autenticaToken(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
+  console.log(req)
+  console.log(req.headers.authorization)
+  console.log(token)
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido' });
   }
