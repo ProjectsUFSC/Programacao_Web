@@ -35,7 +35,8 @@ export default async () => {
         key: fs.readFileSync(path.resolve(__dirname, 'localhost+2-key.pem')), // Adjust the path if needed
         cert: fs.readFileSync(path.resolve(__dirname, 'localhost+2.pem')),   // Adjust the path if needed
       },
-      port: 5731, // Use your desired port for the frontend
+      host: '0.0.0.0',
+      port: 8081,
     },
   };
 };
