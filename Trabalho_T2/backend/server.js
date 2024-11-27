@@ -17,7 +17,7 @@ db.conectaDB();
 app.use('/api', routes);
 
 const key = fs.readFileSync(path.join(__dirname, 'localhost-key.pem'), 'utf8');
-const cert = fs.readFileSync(path.join(__dirname, 'localhost.pem'), 'utf8');
+const cert = fs.readFileSync(path.join(__dirname, 'localhost-cert.pem'), 'utf8');
 
 
 const httpsServer = https.createServer({ key, cert }, app);
