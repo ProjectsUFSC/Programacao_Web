@@ -36,28 +36,31 @@ export default {
   methods: {
     async fetchUserQrCodes() {
       const token = localStorage.getItem("token");
-      const username = localStorage.getItem("username");
       try {
         const response = await axios.get("https://localhost:3000/api/user-qr-codes",
-        { username: username }, 
         { headers: { Authorization: `Bearer ${token}` },});
         this.userQrCodes = response.data.codes;
       } catch (error) {
         console.error("Erro ao buscar QR-Codes cadastrados:", error);
       }
     },
-    async registerQrCode(decodedText) {
+    async registerQrCode(decodedText, decodedResult) {
+      if (!decodedText) {
+        console.error("Texto do QR-Code não encontrado");
+        return;
+      }
       const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
       try {
         await axios.post(
-          "http://localhost:3000/api/qr-codes",
-          { code: decodedText },
+          "https://localhost:3000/api/qr-codes",
+          { code: decodedText, username: username },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         alert("QR-Code registrado com sucesso!");
-        this.fetchUserQrCodes(); 
+        this.fetchUserQrCodes();
       } catch (error) {
-        console.error("Erro ao registrar QR-Code:", error);
+        console.error("Erro ao registrar QR-Code:", error.response?.data || error.message);
         alert("Erro ao registrar QR-Code. Tente novamente.");
       }
     },

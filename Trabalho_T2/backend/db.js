@@ -54,19 +54,25 @@ const autenticaUsuario = async (user, password) => {
 };
 
 function autenticaToken(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  console.log(req)
-  console.log(req.headers.authorization)
-  console.log(token)
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
+
+  // console.log("Authorization Header:", authHeader);
+  // console.log("Extracted Token:", token);
+
   if (!token) {
-    return res.status(401).json({ message: 'Token não fornecido' });
+    return res.status(401).json({ message: "Token não fornecido" });
   }
+
   try {
     const decoded = jwt.verify(token, ChaveSecreta);
+
     req.userId = decoded.userId;
+
     next();
   } catch (error) {
-    res.status(403).json({ message: 'Token inválido' });
+    console.error("Token verification error:", error);
+    res.status(403).json({ message: "Token inválido" });
   }
 }
 
@@ -77,8 +83,8 @@ async function AdicionaCodigo(username, code) {
         { $addToSet: { codes: code } }, 
         { returnDocument: 'after', upsert: false } 
       );
-      if (!result.value) {
-        throw new Error('Usuário não encontrado');
+      if (!result) {
+        throw new Error('Usuário não encontrado', );
       }
       return result.value;
     } catch (error) {

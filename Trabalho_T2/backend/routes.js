@@ -44,7 +44,7 @@ router.post('/qr-codes', db.autenticaToken, async (req, res) => {
   }
 
   try {
-      const updatedUser = await AdicionaCodigo(username, code);
+      const updatedUser = await db.AdicionaCodigo(username, code);
       res.status(200).json({ success: true, message: 'QR-Code salvo com sucesso!', user: updatedUser });
   } catch (error) {
       console.error('Erro ao salvar QR-Code:', error.message);
