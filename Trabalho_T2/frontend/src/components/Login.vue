@@ -50,7 +50,6 @@
                 user: this.username,
                 password: this.password,
                 });
-
                 if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('username', this.username);

@@ -18,6 +18,9 @@ app.use('/api', routes);
 
 const PORT = 3000;
 
+const key = fs.readFileSync(path.join(__dirname, 'localhost-key.pem'), 'utf8');
+const cert = fs.readFileSync(path.join(__dirname, 'localhost-cert.pem'), 'utf8');
+
 app.listen(PORT, () => {
   console.log(`HTTP Server running on http://localhost:${PORT}`);
 })
