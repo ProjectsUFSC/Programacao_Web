@@ -1,6 +1,0 @@
-node_modules/
-.env
-.DS_Store
-
-localhost-cert.pem
-localhost-key.pem
