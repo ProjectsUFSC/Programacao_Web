@@ -76,6 +76,7 @@ function autenticaToken(req, res, next) {
   }
 }
 
+
 async function AdicionaCodigo(username, code) {
     try {
       const result = await clientes.findOneAndUpdate(
@@ -120,33 +121,41 @@ async function AchaCodigo(code) {
   }
 }
 
-
 async function CodigoAleatorio() {
   try {
     const result = await clientes.aggregate([
-      { $unwind: '$codes' },
-      { $sample: { size: 1 } }, 
+      { $unwind: '$codes' }, // Desmembrar os códigos
       {
         $project: {
-          code: '$codes',
-          pushSubscription: 1
+          code: '$codes', // Extrair o código
+          pushSubscription: '$pushsubscription' // Certifique-se de usar o nome correto (case-sensitive)
         }
-      }
+      },
+      { $sample: { size: 1 } } // Selecionar um código aleatório
     ]).toArray();
+    // Debug
+    // if (result.length > 0) {
+    //   console.log('Resultado da agregação:', result[0]);
+      
+    //   if (!result[0].pushSubscription) {
+    //     console.warn('PushSubscription ausente para o código:', result[0].code);
+    //   }
 
-    if (result.length > 0) {
-      return {
-        code: result[0].code,
-        pushSubscription: result[0].pushSubscription || null
-      };
-    } else {
-      return null;
-    }
+    //   return {
+    //     code: result[0].code,
+    //     pushSubscription: result[0].pushSubscription || null
+    //   };
+    // } else {
+    //   console.warn('Nenhum resultado encontrado na agregação.');
+    //   return null;
+    // }
   } catch (error) {
     console.error('Erro ao buscar código aleatório:', error.message);
     throw error;
   }
 }
+
+
 
 
   

@@ -46,13 +46,13 @@
     methods: {
         async handleLogin() {
             try {
-                const response = await axios.post('https://localhost:3000/api/login', {
+                const response = await axios.post('http://localhost:3000/api/login', {
                 user: this.username,
                 password: this.password,
                 });
                 if (response.data.token) {
-                localStorage.setItem('token', response.data.token); // Salva o token
-                localStorage.setItem('username', this.username); // Salva o username
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('username', this.username);
                 this.$router.push('/scan');
                 }
             } catch (error) {

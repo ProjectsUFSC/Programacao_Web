@@ -29,12 +29,12 @@ export default {
       false
     );
 
-    qrScanner.render(this.registerQrCode, this.onScanError);
+    qrScanner.render(this.registerQrCode);
 
-    this.fetchUserQrCodes();
+    this.getUserQrCodes();
   },
   methods: {
-    async fetchUserQrCodes() {
+    async getUserQrCodes() {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.get("https://localhost:3000/api/user-qr-codes",
