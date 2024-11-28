@@ -1,9 +1,9 @@
 {
-  "cwd": "/home/joao/web/Programacao_Web/Trabalho_T2",
+  "cwd": "/home/frr/Downloads/aula",
   "type": [
     "web"
   ],
-  "name": "web_trabalho2",
+  "name": "exercicio_aula",
   "framework": "vue",
   "template": "tabs",
   "bundler": "vite",
