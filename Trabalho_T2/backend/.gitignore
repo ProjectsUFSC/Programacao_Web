@@ -1,0 +1,4 @@
+localhost-cert.pem
+localhost-key.pem
+.DS_Store
+node_modules/

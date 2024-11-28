@@ -29,6 +29,8 @@ node_modules/
 
 # dotenv environment variables file
 .env
+localhost-cert.pem
+localhost-key.pem
 
 # Misc
 .DS_Store
@@ -40,3 +42,4 @@ Thumbs.db
 
 # Production build
 www/
+
