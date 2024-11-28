@@ -42,6 +42,7 @@ router.post('/qr-codes', db.autenticaToken, async (req, res) => {
   if (!code || !username) {
       return res.status(400).json({ success: false, message: 'Código e username são obrigatórios' });
   }
+
   try {
       const updatedUser = await db.AdicionaCodigo(username, code);
       res.status(200).json({ success: true, message: 'QR-Code salvo com sucesso!', user: updatedUser });
@@ -80,18 +81,19 @@ router.post('/sorteio', async function (req, resp) {
   console.log('Realizando sorteio e enviando mensagem para um cliente aleatório');
 
   try {
-    const resultado = await db.CodigoAleatorio(); 
+    const resultado = await CodigoAleatorio();
     if (!resultado) {
       return resp.status(404).json({ success: false, message: 'Nenhum código disponível para sorteio' });
     }
+
     const { code, pushSubscription } = resultado;
-    
+
     if (!pushSubscription) {
       return resp.status(404).json({ success: false, message: 'PushSubscription não encontrada para o código selecionado' });
     }
 
     const mensagem = `Codigo: ${code}. Parabéns, você foi sorteado na promoção dos produtos X, entre em contato para receber seu prêmio.`;
-    console.log(mensagem)
+
     await envia(pushSubscription, mensagem);
 
     resp.status(200).json({

@@ -16,19 +16,14 @@ db.conectaDB();
 
 app.use('/api', routes);
 
-const PORT = 3000;
-
 const key = fs.readFileSync(path.join(__dirname, 'localhost-key.pem'), 'utf8');
 const cert = fs.readFileSync(path.join(__dirname, 'localhost-cert.pem'), 'utf8');
 
-app.listen(PORT, () => {
-  console.log(`HTTP Server running on http://localhost:${PORT}`);
-})
 
-// const key = fs.readFileSync(path.join(__dirname, 'localhost+2-key.pem'), 'utf8');
-// const cert = fs.readFileSync(path.join(__dirname, 'localhost+2.pem'), 'utf8');
-// const httpsServer = https.createServer({ key, cert }, app);
+const httpsServer = https.createServer({ key, cert }, app);
 
-// httpsServer.listen(PORT, () => {
-//   console.log(`HTTPS Server running on https://localhost:${PORT}`);
-// });
+const PORT = 3000;
+
+httpsServer.listen(PORT, () => {
+  console.log(`HTTPS Server running on https://localhost:${PORT}`);
+});

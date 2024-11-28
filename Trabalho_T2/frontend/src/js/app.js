@@ -43,5 +43,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+
 // Mount the app
 app.mount('#app');
