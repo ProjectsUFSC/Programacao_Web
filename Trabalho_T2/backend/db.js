@@ -55,9 +55,9 @@ const autenticaUsuario = async (user, password) => {
 
 function autenticaToken(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
-  console.log(req)
-  console.log(req.headers.authorization)
-  console.log(token)
+  // console.log(req)
+  // console.log(req.headers.authorization)
+  // console.log(token)
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido' });
   }
