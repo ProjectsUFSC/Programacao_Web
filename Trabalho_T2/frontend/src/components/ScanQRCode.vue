@@ -29,33 +29,35 @@ export default {
       false
     );
 
-    qrScanner.render(this.registerQrCode, this.onScanError);
+    qrScanner.render(this.registerQrCode);
 
-    this.fetchUserQrCodes();
+    this.getUserQrCodes();
   },
   methods: {
-    async fetchUserQrCodes() {
+    async getUserQrCodes() {
       const token = localStorage.getItem("token");
       const username = localStorage.getItem("username");
       try {
-        const response = await axios.get("https://localhost:3000/api/user-qr-codes",
-        { username: username }, 
-        { headers: { Authorization: `Bearer ${token}` },});
-        this.userQrCodes = response.data.codes;
+      const response = await axios.get("http://localhost:3000/api/user-qr-codes", {
+      params: { username: username },
+      headers: { Authorization: `Bearer ${token}` },
+      });
+      this.userQrCodes = response.data.codes;
       } catch (error) {
         console.error("Erro ao buscar QR-Codes cadastrados:", error);
       }
     },
     async registerQrCode(decodedText) {
       const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
       try {
         await axios.post(
           "http://localhost:3000/api/qr-codes",
-          { code: decodedText },
+          { code: decodedText, username: username},
           { headers: { Authorization: `Bearer ${token}` } }
         );
         alert("QR-Code registrado com sucesso!");
-        this.fetchUserQrCodes(); 
+        this.getUserQrCodes(); 
       } catch (error) {
         console.error("Erro ao registrar QR-Code:", error);
         alert("Erro ao registrar QR-Code. Tente novamente.");
