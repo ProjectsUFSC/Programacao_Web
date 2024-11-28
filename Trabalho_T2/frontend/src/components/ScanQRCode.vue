@@ -50,6 +50,7 @@ export default {
         return;
       }
       const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
       try {
         await axios.post(
           "https://localhost:3000/api/qr-codes",

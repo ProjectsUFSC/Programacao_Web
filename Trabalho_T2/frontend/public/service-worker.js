@@ -22,30 +22,32 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET') return; // Processa apenas requisições GET
+
+  const url = new URL(event.request.url);
+
+  // Estratégia Network First
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        console.log('[Service Worker] Cache hit:', event.request.url);
-        return cachedResponse;
-      }
-      console.log('[Service Worker] Fetching from network:', event.request.url);
-      return fetch(event.request)
-        .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200) {
-            return networkResponse;
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Se a resposta for bem-sucedida, salva no cache e retorna
+        return caches.open('dynamic-cache').then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          console.log('[Service Worker] Fetched and cached:', event.request.url);
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        // Em caso de erro, retorna do cache
+        console.warn('[Service Worker] Network failed, serving from cache:', event.request.url);
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
           }
-          return caches.open('dynamic-cache').then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-            console.log('[Service Worker] Cached:', event.request.url);
-            return networkResponse;
-          });
-        })
-        .catch((error) => {
-          console.error('[Service Worker] Fetch failed:', error);
+          // Se não houver cache, retorna uma mensagem de erro
           return new Response('Service unavailable.', { status: 503 });
         });
-    })
+      })
   );
 });
 
