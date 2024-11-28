@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 
 router.post('/register', async (req, res) => {
   const { user, password, pushSubscription } = req.body;
-  console.log('Received PushSubscription:', pushSubscription);
+  // console.log('Received PushSubscription:', pushSubscription);
   debugger
   try {
     const userId = await db.registraUsuario(user, password, pushSubscription);
@@ -81,7 +81,7 @@ router.post('/sorteio', async function (req, resp) {
   console.log('Realizando sorteio e enviando mensagem para um cliente aleatório');
 
   try {
-    const resultado = await CodigoAleatorio();
+    const resultado = await db.CodigoAleatorio();
     if (!resultado) {
       return resp.status(404).json({ success: false, message: 'Nenhum código disponível para sorteio' });
     }
@@ -93,7 +93,7 @@ router.post('/sorteio', async function (req, resp) {
     }
 
     const mensagem = `Codigo: ${code}. Parabéns, você foi sorteado na promoção dos produtos X, entre em contato para receber seu prêmio.`;
-
+    console.log('Enviando mensagem para o cliente:', mensagem);
     await envia(pushSubscription, mensagem);
 
     resp.status(200).json({

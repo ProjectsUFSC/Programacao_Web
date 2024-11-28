@@ -48,6 +48,7 @@
     methods: {
       async handleRegister() {
         try {
+          console.log('Registrando usuário...');
           const registration = await navigator.serviceWorker.ready;
           let subscription = await registration.pushManager.getSubscription();
           
@@ -61,7 +62,7 @@
             });
           }
           console.log(subscription)
-          await axios.post('http://localhost:3000/api/register', {
+          await axios.post('https://localhost:3000/api/register', {
             user: this.username,
             password: this.password,
             pushSubscription: subscription,

@@ -54,7 +54,8 @@ const autenticaUsuario = async (user, password) => {
 };
 
 function autenticaToken(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
   // console.log(req)
   // console.log(req.headers.authorization)
   // console.log(token)
@@ -66,7 +67,8 @@ function autenticaToken(req, res, next) {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(403).json({ message: 'Token inválido' });
+    console.error("Token verification error:", error);
+    res.status(403).json({ message: "Token inválido" });
   }
 }
 
@@ -118,24 +120,15 @@ async function AchaCodigo(code) {
 async function CodigoAleatorio() {
   try {
     const result = await clientes.aggregate([
-      { $unwind: '$codes' },
-      { $sample: { size: 1 } }, 
+      { $unwind: '$codes' }, 
       {
         $project: {
           code: '$codes',
-          pushSubscription: 1
+          pushSubscription: '$pushsubscription'
         }
-      }
+      },
+      { $sample: { size: 1 } }
     ]).toArray();
-
-    if (result.length > 0) {
-      return {
-        code: result[0].code,
-        pushSubscription: result[0].pushSubscription || null
-      };
-    } else {
-      return null;
-    }
   } catch (error) {
     console.error('Erro ao buscar código aleatório:', error.message);
     throw error;
@@ -143,7 +136,6 @@ async function CodigoAleatorio() {
 }
 
 
-  
 
 module.exports = {
   conectaDB,
