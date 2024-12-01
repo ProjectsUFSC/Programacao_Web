@@ -46,7 +46,7 @@
     methods: {
         async handleLogin() {
             try {
-                const response = await axios.post('https://localhost:3000/api/login', {
+                const response = await axios.post('https://192.168.3.24:3000/api/login', {
                 user: this.username,
                 password: this.password,
                 });

@@ -65,16 +65,23 @@ router.get('/user-qr-codes', db.autenticaToken, async (req, res) => {
 });
 
 async function envia(destinatario, assunto) {
+  const { endpoint, keys } = destinatario;
+  const { p256dh, auth } = keys;
 
   webpush.setVapidDetails(SUBJECT, chaves.publicKey, chaves.privateKey);
-  
-  webpush.sendNotification(
-      destinatario,
+
+  try {
+    await webpush.sendNotification(
+      { endpoint, keys: { p256dh, auth } },
       JSON.stringify({
-          title: 'Sorteio',
-          message: assunto
+        title: 'Sorteio',
+        body: assunto, // Use 'body' em vez de 'message'
       })
-  );
+    );
+    console.log('Notificação enviada com sucesso.');
+  } catch (error) {
+    console.error('Erro ao enviar notificação:', error);
+  }
 }
 
 router.post('/sorteio', async function (req, resp) {
@@ -94,6 +101,7 @@ router.post('/sorteio', async function (req, resp) {
 
     const mensagem = `Codigo: ${code}. Parabéns, você foi sorteado na promoção dos produtos X, entre em contato para receber seu prêmio.`;
     console.log('Enviando mensagem para o cliente:', mensagem);
+    console.log('PushSubscription:', pushSubscription);
     await envia(pushSubscription, mensagem);
 
     resp.status(200).json({

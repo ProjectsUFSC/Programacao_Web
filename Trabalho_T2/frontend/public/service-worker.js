@@ -22,15 +22,19 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return; // Processa apenas requisições GET
+  if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+
+  // Ignora cache para URLs de login e registro
+  if (url.pathname.startsWith('/login') || url.pathname.startsWith('/register')) {
+    return;
+  }
 
   // Estratégia Network First
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Se a resposta for bem-sucedida, salva no cache e retorna
         return caches.open('dynamic-cache').then((cache) => {
           cache.put(event.request, networkResponse.clone());
           console.log('[Service Worker] Fetched and cached:', event.request.url);
@@ -38,14 +42,12 @@ self.addEventListener('fetch', (event) => {
         });
       })
       .catch(() => {
-        // Em caso de erro, retorna do cache
         console.warn('[Service Worker] Network failed, serving from cache:', event.request.url);
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;
           }
-          // Se não houver cache, retorna uma mensagem de erro
-          return new Response('Service unavailable.', { status: 503 });
+          return new Response('Serviço indisponível.', { status: 503 });
         });
       })
   );
@@ -58,16 +60,20 @@ self.addEventListener('push', (event) => {
     icon: '/icon.png',
     tag: 'general',
   };
-  const data = event.data?.json() || defaultData;
+  
+  const data = event.data ? event.data.json() : defaultData;
   console.log('[Service Worker] Push received:', data);
+
+  const options = {
+    body: data.body || defaultData.body,
+    icon: data.icon || defaultData.icon,
+    tag: data.tag || defaultData.tag,
+    actions: data.actions || [],
+    requireInteraction: true,
+  };
+
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon || defaultData.icon,
-      tag: data.tag || defaultData.tag,
-      actions: data.actions || [], // Support for notification buttons
-      requireInteraction: true, // Keep the notification visible until user interacts
-    })
+    self.registration.showNotification(data.title || defaultData.title, options)
   );
 });
 

@@ -37,7 +37,7 @@ export default {
     async fetchUserQrCodes() {
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("https://localhost:3000/api/user-qr-codes",
+        const response = await axios.get("https://192.168.3.24:3000/api/user-qr-codes",
         { headers: { Authorization: `Bearer ${token}` },});
         this.userQrCodes = response.data.codes;
       } catch (error) {
@@ -53,7 +53,7 @@ export default {
       const username = localStorage.getItem("username");
       try {
         await axios.post(
-          "https://localhost:3000/api/qr-codes",
+          "https://192.168.3.24:3000/api/qr-codes",
           { code: decodedText, username: username },
           { headers: { Authorization: `Bearer ${token}` } }
         );
