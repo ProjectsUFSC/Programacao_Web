@@ -56,7 +56,7 @@ router.get('/user-qr-codes', db.autenticaToken, async (req, res) => {
   const userId = req.userId;
   try {
     const codes = await db.buscarCodigos(userId);
-    console.log(codes)
+    // console.log(codes)
     res.status(200).json({ success: true, codes });
   } catch (error) {
     console.error('Erro ao buscar QR-Codes do usuário:', error.message);
