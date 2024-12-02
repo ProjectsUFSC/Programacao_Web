@@ -69,7 +69,7 @@ export default {
         this.fetchUserQrCodes();
       } catch (error) {
         console.error("Erro ao registrar QR-Code:", error.response?.data || error.message);
-        alert("Erro ao registrar QR-Code. Tente novamente.");
+        alert("Erro ao registrar QR-Code. " + (error.response?.data?.message || ""));
       } finally{
         setTimeout(() => {
         this.isProcessing = false;

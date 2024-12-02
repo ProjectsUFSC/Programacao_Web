@@ -48,7 +48,7 @@ router.post('/qr-codes', db.autenticaToken, async (req, res) => {
       res.status(200).json({ success: true, message: 'QR-Code salvo com sucesso!', user: updatedUser });
   } catch (error) {
       console.error('Erro ao salvar QR-Code:', error.message);
-      res.status(500).json({ success: false, message: 'Erro ao salvar QR-Code' });
+      res.status(500).json({ success: false, message:  error.message });
   }
 });
 
@@ -93,15 +93,15 @@ router.post('/sorteio', async function (req, resp) {
       return resp.status(404).json({ success: false, message: 'Nenhum código disponível para sorteio' });
     }
 
-    const { code, pushSubscription } = resultado;
+    const { code, user , pushSubscription } = resultado;
 
     if (!pushSubscription) {
       return resp.status(404).json({ success: false, message: 'PushSubscription não encontrada para o código selecionado' });
     }
 
     const mensagem = `Codigo: ${code}. Parabéns, você foi sorteado na promoção dos produtos X, entre em contato para receber seu prêmio.`;
-    console.log('Enviando mensagem para o cliente:', mensagem);
-    console.log('PushSubscription:', pushSubscription);
+    console.log(`Enviando mensagem para o cliente ${user}:`, mensagem);
+    // console.log('PushSubscription:', pushSubscription);
     await envia(pushSubscription, mensagem);
 
     resp.status(200).json({
