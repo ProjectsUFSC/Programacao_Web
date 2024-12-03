@@ -62,7 +62,7 @@
             });
           }
           console.log(subscription)
-          await axios.post('https://200.135.67.99:3000/api/register', {
+          await axios.post('https://localhost:3000/api/register', {
             user: this.username,
             password: this.password,
             pushSubscription: subscription,
