@@ -70,6 +70,7 @@
 
           this.successMessage = 'Usuário registrado com sucesso!';
           this.errorMessage = '';
+          this.$router.push('/');
         } catch (error) {
           console.error('Erro ao registrar usuário:', error.response?.data || error.message);
           this.successMessage = '';
@@ -98,25 +99,29 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 50%;
+    width: 80%;
+    background-color: #f7e3bf;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.505);
   }
   
   /* Form Styling */
   form {
-    width: 100%;
+    width: 90%;
     max-width: 400px;
-    background: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
   
   h1 {
     margin-bottom: 20px;
-    color: #333;
+    color: #311312;
     text-align: center;
   }
   
@@ -127,13 +132,14 @@
   label {
     display: block;
     font-weight: bold;
+    color: #311312;
     margin-bottom: 5px;
   }
   
   input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #3b2323;
     border-radius: 4px;
     box-sizing: border-box;
   }
@@ -146,6 +152,7 @@
   }
   
   .btn {
+    font-weight: bold;
     padding: 10px 20px;
     font-size: 16px;
     border: none;
@@ -154,21 +161,22 @@
   }
   
   .btn.primary {
-    background-color: #4caf50;
+    background-color: #D14B7B;
     color: white;
+    margin-right: 10px;
   }
   
   .btn.primary:hover {
-    background-color: #45a049;
+    background-color: #d2326a;
   }
   
   .btn.secondary {
-    background-color: #f44336;
+    background-color: #ff3535;
     color: white;
   }
   
   .btn.secondary:hover {
-    background-color: #e53935;
+    background-color: #d31414;
   }
   
   /* Success and Error Messages */

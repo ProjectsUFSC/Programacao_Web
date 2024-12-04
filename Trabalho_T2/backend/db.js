@@ -21,7 +21,9 @@ async function conectaDB() {
 
 async function registraUsuario(user, password, pushsubscription) {
     try {
-      
+      if(await clientes.findOne({ user })) {
+        throw new Error('Usuário já registrado');
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await clientes.insertOne({ user, password: hashedPassword, pushsubscription: pushsubscription});
       return result.insertedId;
@@ -74,6 +76,12 @@ function autenticaToken(req, res, next) {
 
 async function AdicionaCodigo(username, code) {
     try {
+      
+      const existingCode = await clientes.findOne({ codes: code });
+      if (existingCode) {
+        throw new Error('Este código já foi cadastrado por outro usuário.');
+      }
+
       const result = await clientes.findOneAndUpdate(
         { user: username }, 
         { $addToSet: { codes: code } }, 
@@ -120,15 +128,33 @@ async function AchaCodigo(code) {
 async function CodigoAleatorio() {
   try {
     const result = await clientes.aggregate([
-      { $unwind: '$codes' }, 
+      { $unwind: '$codes' },
       {
         $project: {
-          code: '$codes',
-          pushSubscription: '$pushsubscription'
+          code: '$codes', 
+          user: '$user',
+          pushSubscription: '$pushsubscription' 
         }
       },
       { $sample: { size: 1 } }
     ]).toArray();
+    // Debug
+    if (result.length > 0) {
+      // console.log('Resultado da agregação:', result[0]);
+
+      if (!result[0].pushSubscription) {
+        console.warn('PushSubscription ausente para o código:', result[0].code);
+      }
+
+      return {
+        code: result[0].code,
+        user: result[0].user,
+        pushSubscription: result[0].pushSubscription || null
+      };
+    } else {
+      console.warn('Nenhum resultado encontrado na agregação.');
+      return null;
+    }
   } catch (error) {
     console.error('Erro ao buscar código aleatório:', error.message);
     throw error;

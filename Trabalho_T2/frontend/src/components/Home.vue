@@ -21,13 +21,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-color: #f5f5f5;
+    height: 50%;
+    width: 80%;
+    background-color: #f7e3bf;
     font-family: Arial, sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.505);
   }
   
   h1 {
     margin-bottom: 20px;
+    color: #311312;
+    
   }
   
   p {
@@ -36,9 +45,10 @@
   }
   
   .button-group button {
-    padding: 10px 20px;
-    margin: 10px;
-    background-color: #4caf50;
+    font-weight: bold;
+    padding: 10px 30px;
+    margin: 10px 0;
+    background-color: #D14B7B;
     color: white;
     border: none;
     border-radius: 4px;
@@ -47,7 +57,7 @@
   }
   
   .button-group button:hover {
-    background-color: #45a049;
+    background-color: #d2326a;
   }
   </style>
   
